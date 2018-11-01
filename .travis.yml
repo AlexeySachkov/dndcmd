@@ -4,5 +4,5 @@ python:
 before_install:
   - pip install pycodestyle
 script:
-  pycodestyle
-  python -m unittest tests/main.py
+  - pycodestyle
+  - python -m unittest tests/main.py
