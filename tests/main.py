@@ -1,5 +1,6 @@
 import unittest
 import tempfile
+import os
 from dndcmd.main import DnDShell
 
 tests = [
@@ -9,9 +10,17 @@ tests = [
 
 class CMDTest(unittest.TestCase):
     def test_main(self):
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+
         for filename in tests:
+            input_file_path = os.path.join(dir_path, 'inputs', filename)
+            self.assertTrue(os.path.exists(input_file_path) and os.path.isfile(input_file_path))
+
+            reference_file_path = os.path.join(dir_path, 'outputs', filename)
+            self.assertTrue(os.path.exists(reference_file_path) and os.path.isfile(reference_file_path))
+
             with self.subTest(file=filename):
-                input_file = open('inputs/{}'.format(filename), 'r')
+                input_file = open(input_file_path, 'r')
                 output_file = tempfile.TemporaryFile(mode='r+')
 
                 shell = DnDShell(stdin=input_file, stdout=output_file)
@@ -24,7 +33,7 @@ class CMDTest(unittest.TestCase):
                 output = output_file.readlines()
                 output_file.close()
 
-                reference_file = open('outputs/{}'.format(filename), 'r')
+                reference_file = open(reference_file_path, 'r')
                 reference = reference_file.readlines()
                 reference_file.close()
 
