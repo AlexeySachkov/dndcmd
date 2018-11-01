@@ -1,5 +1,7 @@
 # D&D command line interface
 
+[![Build Status](https://travis-ci.com/AlexeySachkov/dndcmd.svg?branch=master)](https://travis-ci.com/AlexeySachkov/dndcmd)
+
 During "online" D&D sessions we use [roll20][roll20] in our party...but it is hard to setup a nice and
 full-featured script to automate calculating attack and damage rolls. And anyway: you can
 track status of the your character in any tool including pen and paper.
