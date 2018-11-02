@@ -2,7 +2,7 @@ language: python
 python:
   - "3.6"
 before_install:
-  - pip install pycodestyle
+  - pip install pep8
 script:
-  - pycodestyle
+  - pycodestyle dndcmd tests
   - python -m unittest tests/main.py
