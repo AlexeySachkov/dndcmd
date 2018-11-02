@@ -39,17 +39,18 @@ class Logger:
         Logger._log(LogLevel.INFO, msg)
 
     @staticmethod
-    def error( msg):
+    def error(msg):
         Logger._log(LogLevel.ERROR, msg)
 
     @staticmethod
-    def fatal( msg):
+    def fatal(msg):
         Logger._log(LogLevel.FATAL, msg)
 
 
 class CharacterClass:
     def hp_on_first_level(self):
-        Logger.debug('CharacterClass::hp_on_first_level generic method called!')
+        Logger.debug(
+            'CharacterClass::hp_on_first_level generic method called!')
         pass
 
     def hp_per_level(self):
@@ -86,7 +87,8 @@ class DnDShell(cmd.Cmd):
     character = Character(Warden)
 
     def do_max_hp(self, arg):
-        print('Max HP: {}'.format(self.character.get_max_hp()), file=self.stdout)
+        print('Max HP: {}'.format(self.character.get_max_hp()),
+              file=self.stdout)
 
     def do_levelup(self, arg):
         self.character.levelup()

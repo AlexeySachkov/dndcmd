@@ -14,10 +14,13 @@ class CMDTest(unittest.TestCase):
 
         for filename in tests:
             input_file_path = os.path.join(dir_path, 'inputs', filename)
-            self.assertTrue(os.path.exists(input_file_path) and os.path.isfile(input_file_path))
+            self.assertTrue(os.path.exists(input_file_path) and os.path.isfile(
+                input_file_path))
 
             reference_file_path = os.path.join(dir_path, 'outputs', filename)
-            self.assertTrue(os.path.exists(reference_file_path) and os.path.isfile(reference_file_path))
+            self.assertTrue(
+                os.path.exists(reference_file_path) and os.path.isfile(
+                    reference_file_path))
 
             with self.subTest(file=filename):
                 input_file = open(input_file_path, 'r')
