@@ -36,6 +36,10 @@ class LexerTest(unittest.TestCase):
                                 (Token.TOK_NUMBER, 6), (Token.TOK_OP, '+'),
                                 (Token.TOK_NUMBER, 4), (Token.TOK_EOL,)])
 
+    def test_unknown(self):
+        self.helper('???', [(Token.TOK_UNKNOWN, '?'), (Token.TOK_UNKNOWN, '?'),
+                            (Token.TOK_UNKNOWN, '?'), (Token.TOK_EOL,)])
+
 
 if __name__ == '__main__':
     unittest.main()

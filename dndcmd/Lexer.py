@@ -66,4 +66,6 @@ class Lexer:
             self.pos = self.pos + 1
             return Token.TOK_OP, op
 
-        return Token.TOK_UNKNOWN, self.str[self.pos]
+        char = self.str[self.pos]
+        self.pos = self.pos + 1
+        return Token.TOK_UNKNOWN, char
