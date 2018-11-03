@@ -47,6 +47,7 @@ class Lexer:
             self.pos = self.pos + 1
             while self.pos < len(self.str) and self.str[self.pos].isdigit():
                 num_str += self.str[self.pos]
+                self.pos = self.pos + 1
 
             return Token.TOK_NUMBER, int(num_str)
 
