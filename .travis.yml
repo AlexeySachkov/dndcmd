@@ -5,4 +5,4 @@ before_install:
   - pip install pycodestyle
 script:
   - pycodestyle dndcmd tests
-  - python -m unittest tests/main.py
+  - python -m unittest discover tests
