@@ -6,6 +6,9 @@ class Expr:
     def evaluate(self):
         raise RuntimeError()
 
+    def __str__(self):
+        pass
+
 
 class DiceRollExpr(Expr):
     def __init__(self, dice_size):
@@ -14,6 +17,9 @@ class DiceRollExpr(Expr):
     def evaluate(self):
         return random.randint(1, self.dice_size)
 
+    def __str__(self):
+        return "DiceRollExpr: d{}".format(str(self.dice_size))
+
 
 class ConstantExpr(Expr):
     def __init__(self, value):
@@ -21,6 +27,9 @@ class ConstantExpr(Expr):
 
     def evaluate(self):
         return self.value
+
+    def __str__(self):
+        return "ConstantExpr: {}".format(str(self.value))
 
 
 class BinOpExpr(Expr):
@@ -38,6 +47,10 @@ class BinOpExpr(Expr):
             return self.lhs.evaluate() * self.rhs.evaluate()
         if self.op == '/':
             return self.lhs.evaluate() / self.rhs.evaluate()
+
+    def __str__(self):
+        return "BinOpExpr: '{}'\n\t{}\n\t{}".format(self.op, self.lhs,
+                                                    self.rhs)
 
 
 class Sema:
