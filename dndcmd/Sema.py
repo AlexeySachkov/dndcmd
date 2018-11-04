@@ -92,26 +92,31 @@ class Sema:
 
     def build_paren_expr(self):
         token = self.consume_token()
+        if not token:
+            return None
+
         if not token.is_paren():
             self.rollback_token()
             return None
         if token.get_arg() != '(':
-            self.error = True
-            self.diags.append((token.source_loc, "Expected '('"))
+            self.diag(token.source_loc, "Expected '('")
             return None
 
         t_expr = self.build_expr()
 
         token = self.consume_token()
+        if not token:
+            return None
         if not token.is_paren() or token.get_arg() != ')':
-            self.error = True
-            self.diags.append((token.source_loc, "Expected ')'"))
+            self.diag(token.source_loc, "Expected ')'")
             return None
 
         return t_expr
 
     def build_dice_roll_expr(self):
         dice_or_num_token = self.consume_token()
+        if not dice_or_num_token:
+            return None
         if not dice_or_num_token.is_number() and \
                 not dice_or_num_token.is_dice():
             self.rollback_token()
@@ -121,6 +126,8 @@ class Sema:
         if dice_or_num_token.is_number():
             multiplier = ConstantExpr(dice_or_num_token.get_arg())
             dice_token = self.consume_token()
+            if not dice_token:
+                return None
         else:
             dice_token = dice_or_num_token
 
@@ -131,10 +138,10 @@ class Sema:
             return None
 
         dice_size_token = self.consume_token()
+        if not dice_size_token:
+            return None
         if not dice_size_token.is_number():
-            self.error = True
-            self.diags.append(
-                (dice_size_token.source_loc, "Expected dice size"))
+            self.diag(dice_size_token.source_loc, "Expected dice size")
             return None
 
         dice_roll = DiceRollExpr(dice_size_token.get_arg())
@@ -146,6 +153,8 @@ class Sema:
 
     def build_constant_expr(self):
         token = self.consume_token()
+        if not token:
+            return None
         if not token.is_number():
             self.rollback_token()
             return None
@@ -154,6 +163,8 @@ class Sema:
 
     def build_binop_expr(self, lhs):
         token = self.consume_token()
+        if not token:
+            return None
         if not token.is_op():
             self.rollback_token()
             return None
@@ -162,12 +173,14 @@ class Sema:
 
         rhs = self.build_expr()
         if rhs is None:
-            self.error = True
-            self.diags.append(
-                (token.source_loc, "Expected expression after an operation"))
+            self.diag(token.source_loc,
+                      "Expected an expression after the '{}' operation".format(
+                          op))
             return None
 
         next_token = self.consume_token()
+        if not next_token:
+            return None
         if not next_token.is_op():
             self.rollback_token()  # rollback next_token
             return BinOpExpr(lhs, rhs, op)
@@ -187,8 +200,23 @@ class Sema:
 
         return -1
 
+    def diagnose_unknown_token(self, token):
+        if token.is_unknown():
+            self.diag(token.source_loc,
+                      "Unexpected symbol '{}'".format(token.get_arg()))
+            return True
+
+        return False
+
+    def diag(self, column, msg):
+        self.error = True
+        self.diags.append((column, msg))
+
     def consume_token(self):
         token = self.tokens[self.pos]
+        if self.diagnose_unknown_token(token):
+            return None
+
         self.pos = self.pos + 1
         return token
 
