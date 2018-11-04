@@ -17,9 +17,15 @@ This repo is currently in very initial state: it is almost empty actually.
 
 ## TODO-list:
 
+- [ ] Command to print current character status
+- [ ] Commands to track damage/ongoing damage/healing surges
+- [ ] Emit diagnostic messages for wrong `roll` commands
+- [ ] Develop tests for evaluating of `roll` commands
+- [ ] Command to roll ability checks
+- [ ] Command to roll attacks
 - [ ] Describe requirements somehow
-- [ ] Develop some tests
-- [ ] Setup some CI to check code style and launch tests
+- [X] Develop some tests
+- [X] Setup some CI to check code style and launch tests
 
 ## License
 
