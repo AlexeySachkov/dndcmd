@@ -92,9 +92,14 @@ class DnDShell(cmd.Cmd):
         lex = Lexer()
         sema = Sema()
 
-        print(
-            'Result: {}'.format(sema.build_ast(lex.tokenize(arg)).evaluate()),
-            file=self.stdout)
+        expr, diags = sema.build_ast(lex.tokenize(arg))
+        if expr is None:
+            for column, msg in diags:
+                pointer = '^'.rjust(column + 1, ' ')
+                print('Error: {}\n{}\n{}'.format(msg, arg, pointer),
+                      file=self.stdout)
+        else:
+            print('Result: {}'.format(expr.evaluate()), file=self.stdout)
 
     def do_max_hp(self, arg):
         print('Max HP: {}'.format(self.character.get_max_hp()),

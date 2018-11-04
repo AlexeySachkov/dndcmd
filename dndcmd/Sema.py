@@ -1,4 +1,3 @@
-from dndcmd.Lexer import Token
 import random
 
 
@@ -58,67 +57,87 @@ class Sema:
         self.tokens = []
         self.pos = 0
         self.expr = None
+        self.diags = []
+        self.error = False
 
     def build_ast(self, tokens):
         self.tokens = tokens
         self.pos = 0
-        return self.build_expr()
+        self.diags = []
+        self.error = False
+
+        expr = self.build_expr()
+        return expr, self.diags
 
     def build_expr(self):
         t_expr = self.build_paren_expr()
-        if t_expr is None:
+        if t_expr is None and not self.error:
             t_expr = self.build_dice_roll_expr()
-            if t_expr is None:
+            if t_expr is None and not self.error:
                 t_expr = self.build_constant_expr()
 
-        if t_expr is None:
-            raise RuntimeError()
+        if self.error:
+            return None
+        elif t_expr is None:
+            return None
 
         binop = self.build_binop_expr(t_expr)
 
         if binop is not None:
             return binop
+        elif self.error:
+            return None
 
         return t_expr
 
     def build_paren_expr(self):
-        if self.cur_tok() != Token.TOK_PAREN:
+        token = self.consume_token()
+        if not token.is_paren():
+            self.rollback_token()
             return None
-        if self.cur_tok_arg() != '(':
-            raise RuntimeError()
+        if token.get_arg() != '(':
+            self.error = True
+            self.diags.append((token.source_loc, "Expected '('"))
+            return None
 
-        self.next_tok()
         t_expr = self.build_expr()
 
-        if self.cur_tok() != Token.TOK_PAREN:
-            raise RuntimeError()
-        if self.cur_tok_arg() != ')':
-            raise RuntimeError()
+        token = self.consume_token()
+        if not token.is_paren() or token.get_arg() != ')':
+            self.error = True
+            self.diags.append((token.source_loc, "Expected ')'"))
+            return None
 
-        self.next_tok()
         return t_expr
 
     def build_dice_roll_expr(self):
-        if self.cur_tok() != Token.TOK_NUMBER and \
-                self.cur_tok() != Token.TOK_DICE:
+        dice_or_num_token = self.consume_token()
+        if not dice_or_num_token.is_number() and \
+                not dice_or_num_token.is_dice():
+            self.rollback_token()
             return None
 
         multiplier = None
-        if self.cur_tok() == Token.TOK_NUMBER:
-            multiplier = ConstantExpr(self.cur_tok_arg())
-            self.next_tok()
+        if dice_or_num_token.is_number():
+            multiplier = ConstantExpr(dice_or_num_token.get_arg())
+            dice_token = self.consume_token()
+        else:
+            dice_token = dice_or_num_token
 
-        if self.cur_tok() != Token.TOK_DICE:
-            self.rollback_tok()
+        if not dice_token.is_dice():
+            self.rollback_token()  # rollback dice_token
+            if multiplier is not None:
+                self.rollback_token()  # rollback dice_or_num_token
             return None
 
-        self.next_tok()
+        dice_size_token = self.consume_token()
+        if not dice_size_token.is_number():
+            self.error = True
+            self.diags.append(
+                (dice_size_token.source_loc, "Expected dice size"))
+            return None
 
-        if self.cur_tok() != Token.TOK_NUMBER:
-            raise RuntimeError()
-
-        dice_roll = DiceRollExpr(self.cur_tok_arg())
-        self.next_tok()
+        dice_roll = DiceRollExpr(dice_size_token.get_arg())
 
         if multiplier is None:
             return dice_roll
@@ -126,25 +145,34 @@ class Sema:
         return BinOpExpr(multiplier, dice_roll, '*')
 
     def build_constant_expr(self):
-        if self.cur_tok() != Token.TOK_NUMBER:
+        token = self.consume_token()
+        if not token.is_number():
+            self.rollback_token()
             return None
 
-        constant = ConstantExpr(self.cur_tok_arg())
-        self.next_tok()
-        return constant
+        return ConstantExpr(token.get_arg())
 
     def build_binop_expr(self, lhs):
-        if self.cur_tok() != Token.TOK_OP:
+        token = self.consume_token()
+        if not token.is_op():
+            self.rollback_token()
             return None
 
-        op = self.cur_tok_arg()
-        self.next_tok()
+        op = token.get_arg()
 
         rhs = self.build_expr()
-        if self.cur_tok() != Token.TOK_OP:
+        if rhs is None:
+            self.error = True
+            self.diags.append(
+                (token.source_loc, "Expected expression after an operation"))
+            return None
+
+        next_token = self.consume_token()
+        if not next_token.is_op():
+            self.rollback_token()  # rollback next_token
             return BinOpExpr(lhs, rhs, op)
 
-        next_op = self.cur_tok_arg()
+        next_op = next_token.get_arg()
         if self.get_precedence(op) >= self.get_precedence(next_op):
             binop = BinOpExpr(lhs, rhs, op)
             return self.build_binop_expr(binop)
@@ -159,15 +187,10 @@ class Sema:
 
         return -1
 
-    def cur_tok(self):
-        return self.tokens[self.pos][0]
-
-    def cur_tok_arg(self):
-        return self.tokens[self.pos][1]
-
-    def next_tok(self):
+    def consume_token(self):
+        token = self.tokens[self.pos]
         self.pos = self.pos + 1
-        return self.cur_tok()
+        return token
 
-    def rollback_tok(self):
+    def rollback_token(self):
         self.pos = self.pos - 1
