@@ -1,5 +1,7 @@
 import cmd
 import enum
+from dndcmd.Lexer import Lexer
+from dndcmd.Sema import Sema
 
 
 class LogLevel(enum.Enum):
@@ -85,6 +87,14 @@ class DnDShell(cmd.Cmd):
     file = None
 
     character = Character(Warden)
+
+    def do_roll(self, arg):
+        lex = Lexer()
+        sema = Sema()
+
+        print(
+            'Result: {}'.format(sema.build_ast(lex.tokenize(arg)).evaluate()),
+            file=self.stdout)
 
     def do_max_hp(self, arg):
         print('Max HP: {}'.format(self.character.get_max_hp()),
