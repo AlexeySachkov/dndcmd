@@ -1,0 +1,3 @@
+Hi, it is a D&D shell!
+D&D > Result: 6
+D&D > Bye!

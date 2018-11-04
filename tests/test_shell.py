@@ -4,7 +4,7 @@ import os
 from dndcmd.main import DnDShell
 
 tests = [
-    'test_basic.txt'
+    'test_basic.txt', 'test_roll_1.txt', 'test_roll_2.txt', 'test_roll_3.txt'
 ]
 
 

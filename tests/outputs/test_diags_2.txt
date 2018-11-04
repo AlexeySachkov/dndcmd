@@ -1,0 +1,7 @@
+Hi, it is a D&D shell!
+D&D > roll d
+Error: Expected dice size
+d
+ ^
+D&D > exit
+Bye!

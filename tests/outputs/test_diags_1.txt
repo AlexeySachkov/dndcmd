@@ -1,0 +1,9 @@
+Hi, it is a D&D shell!
+D&D > roll (2 +
+Error: Expected expression after an operation
+(2 +
+   ^
+Error: Expected ')'
+(2 +
+    ^
+D&D > Bye!
