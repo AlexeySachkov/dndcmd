@@ -19,11 +19,13 @@ This repo is currently in very initial state: it is almost empty actually.
 
 - [ ] Command to print current character status
 - [ ] Commands to track damage/ongoing damage/healing surges
-- [ ] Emit diagnostic messages for wrong `roll` commands
+- [X] Emit diagnostic messages for wrong `roll` commands
+    - Basically works, but of course there are some bugs
 - [ ] Develop tests for evaluating of `roll` commands
-- [ ] Command to roll ability checks
+- [ ] Command to roll ability checks (#5)
 - [ ] Command to roll attacks
 - [ ] Describe requirements somehow
+    - issues? wiki?
 - [X] Develop some tests
 - [X] Setup some CI to check code style and launch tests
 
