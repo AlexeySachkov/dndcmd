@@ -88,16 +88,25 @@ class DnDShell(cmd.Cmd):
 
     character = Character(Warden)
 
+    def emit_diags(self, arg, diags):
+        for column, msg in diags:
+            pointer = '^'.rjust(column + 1, ' ')
+            print('Error: {}\n{}\n{}'.format(msg, arg, pointer),
+                  file=self.stdout)
+
     def do_roll(self, arg):
         lex = Lexer()
         sema = Sema()
 
-        expr, diags = sema.build_ast(lex.tokenize(arg))
+        # TODO: wrap this into a Driver
+        tokens, diags = lex.tokenize(arg)
+        if tokens is None:
+            self.emit_diags(arg, diags)
+            return
+
+        expr, diags = sema.build_ast(tokens)
         if expr is None:
-            for column, msg in diags:
-                pointer = '^'.rjust(column + 1, ' ')
-                print('Error: {}\n{}\n{}'.format(msg, arg, pointer),
-                      file=self.stdout)
+            self.emit_diags(arg, diags)
         else:
             print('Result: {}'.format(expr.evaluate()), file=self.stdout)
 

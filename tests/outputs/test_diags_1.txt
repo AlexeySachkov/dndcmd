@@ -1,8 +1,5 @@
 Hi, it is a D&D shell!
 D&D > Error: Expected an expression after the '+' operation
-(2 +
-   ^
-Error: Expected ')'
-(2 +
-    ^
+2 +
+  ^
 D&D > Bye!

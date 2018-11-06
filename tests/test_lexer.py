@@ -6,9 +6,20 @@ class LexerTest(unittest.TestCase):
     def setUp(self):
         self.lex = Lexer()
 
-    def helper(self, input, reference):
-        tokens = self.lex.tokenize(input)
-        self.assertListEqual(reference, tokens)
+    def helper(self, input, ref_tokens, ref_diags=None):
+        no_tokens = False
+        if ref_diags is None:
+            ref_diags = []
+        else:
+            no_tokens = True
+
+        tokens, diags = self.lex.tokenize(input)
+        if no_tokens:
+            self.assertIsNone(tokens)
+        else:
+            self.assertListEqual(ref_tokens, tokens)
+
+        self.assertEqual(ref_diags, diags)
 
     def test_eol(self):
         self.helper('', [Token(TokenType.T_EOL, (), 0)])
@@ -51,6 +62,12 @@ class LexerTest(unittest.TestCase):
                             Token(TokenType.T_UNKNOWN, '?', 1),
                             Token(TokenType.T_UNKNOWN, '?', 2),
                             Token(TokenType.T_EOL, (), 3)])
+
+    def test_missed_parens(self):
+        self.helper('(', None, [(1, "Expected ')'")])
+
+    def test_missed_parens_2(self):
+        self.helper(')', None, [(0, "Unexpected ')'")])
 
 
 if __name__ == '__main__':

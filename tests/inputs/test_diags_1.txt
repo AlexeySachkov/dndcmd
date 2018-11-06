@@ -1,2 +1,2 @@
-roll (2 +
+roll 2 +
 exit

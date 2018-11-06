@@ -1,0 +1,5 @@
+Hi, it is a D&D shell!
+D&D > Error: Expected ')'
+(
+ ^
+D&D > Bye!

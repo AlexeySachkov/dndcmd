@@ -80,13 +80,31 @@ class Lexer:
         self.last_char = ' '
 
         tokens = []
+        diags = []
+        depth = 0
+        eol = None
         while True:
             token = self.get_next_token()
+            if token.is_paren():
+                if token.get_arg() == '(':
+                    depth = depth + 1
+                else:
+                    if depth == 0:
+                        diags.append((token.source_loc, "Unexpected ')'"))
+                    else:
+                        depth = depth - 1
             tokens.append(token)
             if token.is_eol():
+                eol = token
                 break
 
-        return tokens
+        if depth > 0:
+            diags.append((eol.source_loc, "Expected ')'"))
+
+        if len(diags) != 0:
+            tokens = None
+
+        return tokens, diags
 
     def get_next_token(self):
         while self.pos < len(self.str) and self.str[self.pos].isspace():
