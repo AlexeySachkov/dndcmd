@@ -61,6 +61,8 @@ class TestSema(unittest.TestCase):
         self.assertEqual(
             "BinOpExpr: '+'\n\tConstantExpr: 2\n\tConstantExpr: 3", str(expr))
 
+    # TODO: tests for diags here
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,6 @@
 import cmd
 import enum
-from dndcmd.Lexer import Lexer
-from dndcmd.Sema import Sema
+from dndcmd.Driver import Driver
 
 
 class LogLevel(enum.Enum):
@@ -84,7 +83,10 @@ class Character:
 class DnDShell(cmd.Cmd):
     intro = 'Hi, it is a D&D shell!'
     prompt = 'D&D > '
-    file = None
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.driver = Driver(self.stdout)
 
     character = Character(Warden)
 
@@ -95,20 +97,7 @@ class DnDShell(cmd.Cmd):
                   file=self.stdout)
 
     def do_roll(self, arg):
-        lex = Lexer()
-        sema = Sema()
-
-        # TODO: wrap this into a Driver
-        tokens, diags = lex.tokenize(arg)
-        if tokens is None:
-            self.emit_diags(arg, diags)
-            return
-
-        expr, diags = sema.build_ast(tokens)
-        if expr is None:
-            self.emit_diags(arg, diags)
-        else:
-            print('Result: {}'.format(expr.evaluate()), file=self.stdout)
+        self.driver.execute_roll_command(arg)
 
     def do_max_hp(self, arg):
         print('Max HP: {}'.format(self.character.get_max_hp()),
